@@ -33,7 +33,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/locksy-securite/front-end:latest
+            ghcr.io/locksy-securite/back-end:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
  
