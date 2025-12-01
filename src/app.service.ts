@@ -1,22 +1,29 @@
 import { Injectable } from '@nestjs/common';
 
+// Définition du type User
+interface User {
+  email: string;
+  name: string;
+  age?: number; // optionnel
+}
+
 @Injectable()
 export class AppService {
-  private usersService: any[]=[];
+  private usersService: User[] = [];
 
-  //Créer un utilisateur
-  async create(dto: any): Promise<any> {
+  // Créer un utilisateur
+  async create(dto: User): Promise<User> {
     this.usersService.push(dto);
     return dto;
   }
 
   // Trouver tous les utilisateurs
-  async findAll(): Promise<any[]> {
+  async findAll(): Promise<User[]> {
     return this.usersService;
   }
 
   // Trouver un utilisateur par email
-  async findOne(email: string): Promise<any> {
+  async findOne(email: string): Promise<User | undefined> {
     return this.usersService.find(user => user.email === email);
   }
 
@@ -26,7 +33,7 @@ export class AppService {
   }
 
   // Mettre à jour un utilisateur par email
-  async update(email: string, dto: any): Promise<any> {
+  async update(email: string, dto: Partial<User>): Promise<User | null> {
     const userIndex = this.usersService.findIndex(user => user.email === email);
     if (userIndex === -1) {
       return null;
@@ -34,5 +41,4 @@ export class AppService {
     this.usersService[userIndex] = { ...this.usersService[userIndex], ...dto };
     return this.usersService[userIndex];
   }
-
 }
