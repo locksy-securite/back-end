@@ -4,7 +4,6 @@ WORKDIR /app
 
 # Copier uniquement les fichiers nécessaires pour installer les dépendances,
 COPY package.json ./
-COPY nest-cli.json ./
 
 # Installer toutes les dépendances (avec devDependencies pour pouvoir build),
 RUN npm install
