@@ -11,24 +11,16 @@ export class DatabaseService implements OnModuleInit {
     this.pool = new Pool({
       user: process.env.PGUSER,
       host: process.env.PGHOST,
-      database: 'postgres', // base par défaut pour vérifier l'existence
+      database: 'postgres', // base par défaut
       password: process.env.PGPASSWORD,
-      port: process.env.PGPORT,
+      port: parseInt(process.env.PGPORT ?? '5432', 10), // ✅ CORRECTION IMPORTANTE
     });
-    console.log('Pool PostgreSQL créé.');
   }
 
   async onModuleInit() {
-    // Test connexion
     await this.testConnection();
-
-    // Setup DB (équivalent de ton setupDatabase)
     await this.setupDatabase();
-
-    // Initialisation des tables
     await this.initTable();
-
-    // Démarrer le service
     await this.start();
   }
 
@@ -38,7 +30,7 @@ export class DatabaseService implements OnModuleInit {
       console.log('Connexion PostgreSQL OK:', res.rows[0]);
     } catch (err) {
       console.error('Erreur de connexion à PostgreSQL:', err);
-      throw err; // important si critique
+      throw err;
     }
   }
 
@@ -46,19 +38,21 @@ export class DatabaseService implements OnModuleInit {
     const result = await this.pool.query(
       "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';"
     );
-    console.log('Tables dans la base de données:', result.rows.map(r => r.table_name));
+    console.log(
+      'Tables dans la base de données:',
+      result.rows.map((r) => r.table_name),
+    );
   }
 
   async setupDatabase() {
-  try {
-    // Ici tu mets ta logique de création/migration
-    console.log('Configuration de la base de données terminée.');
-  } catch (err) {
-    console.error('Erreur lors de la configuration de la base de données:', err);
-  } finally {
-    console.log('Processus de configuration de la base de données terminé.');
+    try {
+      console.log('Configuration de la base de données terminée.');
+    } catch (err) {
+      console.error('Erreur lors de la configuration de la base de données:', err);
+    } finally {
+      console.log('Processus de configuration de la base de données terminé.');
+    }
   }
-}
 
   async start() {
     try {
@@ -68,16 +62,15 @@ export class DatabaseService implements OnModuleInit {
       console.error('Erreur de connexion à PostgreSQL:', err);
     }
 
-    // Lister les tables
     await this.listTables();
   }
 
   async initTable() {
-  try {
-    await this.pool.connect();
+    try {
+      await this.pool.connect();
 
-    //Creation des tables
-    await this.pool.query(`
+      // TABLE users
+      await this.pool.query(`
         CREATE TABLE IF NOT EXISTS users (
           id_user UUID DEFAULT gen_random_uuid() PRIMARY KEY,
           email VARCHAR(255) NOT NULL UNIQUE,
@@ -86,7 +79,8 @@ export class DatabaseService implements OnModuleInit {
         );
       `);
 
-    await this.pool.query(`
+      // TABLE notes
+      await this.pool.query(`
         CREATE TABLE IF NOT EXISTS notes (
           id_note UUID DEFAULT gen_random_uuid() PRIMARY KEY,
           title VARCHAR(255) NOT NULL,
@@ -96,7 +90,8 @@ export class DatabaseService implements OnModuleInit {
         );
       `);
 
-    await this.pool.query(`
+      // TABLE credit_cards
+      await this.pool.query(`
         CREATE TABLE IF NOT EXISTS credit_cards (
           id_card UUID DEFAULT gen_random_uuid() PRIMARY KEY,
           card_name VARCHAR(255) NOT NULL,
@@ -108,7 +103,8 @@ export class DatabaseService implements OnModuleInit {
         );
       `);
 
-    await this.pool.query(`
+      // TABLE passwords
+      await this.pool.query(`
         CREATE TABLE IF NOT EXISTS passwords (
           id_password UUID DEFAULT gen_random_uuid() PRIMARY KEY,
           name VARCHAR(255) NOT NULL,
@@ -119,15 +115,15 @@ export class DatabaseService implements OnModuleInit {
         );
       `);
 
-    // Activer RLS
-    await this.pool.query(`
+      // ACTIVER RLS
+      await this.pool.query(`
         ALTER TABLE passwords ENABLE ROW LEVEL SECURITY;
         ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
         ALTER TABLE credit_cards ENABLE ROW LEVEL SECURITY;
       `);
 
-    // Politiques
-    await this.pool.query(`
+      // POLITIQUES RLS
+      await this.pool.query(`
         DROP POLICY IF EXISTS passwords_policy ON passwords;
         CREATE POLICY passwords_policy ON passwords
         FOR ALL USING (id_user = current_setting('app.current_user')::uuid);
@@ -141,12 +137,11 @@ export class DatabaseService implements OnModuleInit {
         FOR ALL USING (id_user = current_setting('app.current_user')::uuid);
       `);
 
-    console.log(' Base de données initialisée avec succès');
-  } catch (err) {
-    console.error('Erreur lors de l’initialisation de la base:', err);
-  } finally {
-    await this.pool.end();
+      console.log('Base de données initialisée avec succès');
+    } catch (err) {
+      console.error('Erreur lors de l’initialisation de la base:', err);
+    } finally {
+      await this.pool.end();
+    }
   }
-}
-
 }
