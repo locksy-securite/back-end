@@ -8,6 +8,6 @@ export class CreateUserDto {
   @MinLength(6)
   password: string;
 
-  @IsString()
-  creditCard: string;
+  // @IsString()
+  // creditCard: string;
 }
