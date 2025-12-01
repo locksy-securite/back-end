@@ -1,21 +1,25 @@
-import tseslint from "@typescript-eslint/eslint-plugin";
-import { defineConfig } from "eslint/config";
+import tseslint from 'typescript-eslint';
+import eslintPlugin from '@eslint/js';
+import parser from '@typescript-eslint/parser';
 
-export default defineConfig([
+export default tseslint.config(
+  // ESLint recommended rules
+  eslintPlugin.configs.recommended,
+
+  // TypeScript recommended rules
+  ...tseslint.configs.recommended,
+
   {
-    files: ["**/*.{ts,tsx}"],
+    files: ['**/*.ts'],
     languageOptions: {
-      parser: "@typescript-eslint/parser",
+      parser, // pass the imported parser object
       parserOptions: {
-        project: "./tsconfig.json",
+        ecmaVersion: 'latest',
+        sourceType: 'module',
       },
     },
-    plugins: {
-      "@typescript-eslint": tseslint,
-    },
-    extends: ["plugin:@typescript-eslint/recommended"],
     rules: {
-      // tes règles ici
+      // your custom rules here
     },
-  },
-]);
+  }
+);
