@@ -14,6 +14,7 @@ export const databaseProviders = [
         username: process.env.PGUSER,
         password: process.env.PGPASSWORD,
         database: process.env.PGDATABASE,
+        ssl: true,
         entities: [
             __dirname + '/../**/*.entity{.ts,.js}',
         ],
