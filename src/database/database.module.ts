@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { Password } from './entity/password.entity';
 import { Note } from './entity/note.entity';
+import { DatabaseService } from './database.service';
 
 @Module({
   imports: [
@@ -15,8 +16,11 @@ import { Note } from './entity/note.entity';
       database: process.env.PGDATABASE,
       entities: [User, Password, Note], // tu peux ajouter CreditCard si besoin
       synchronize: true,
-      autoLoadEntities: true //  false en prod, true seulement en dev
+      autoLoadEntities: true, //  false en prod, true seulement en dev
+      ssl: true,
     }),
   ],
+  providers: [DatabaseService],
+  exports: [DatabaseService],
 })
 export class DatabaseModule {}

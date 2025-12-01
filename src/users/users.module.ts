@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { DatabaseService } from '../database/database.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { DatabaseModule } from '../database/database.module';
 
 @Module({
-  imports: [],
-  providers: [UsersService, DatabaseService, JwtAuthGuard],
+  imports: [DatabaseModule],
+  providers: [UsersService, JwtAuthGuard],
   controllers: [UsersController],
   exports: [UsersService],
 })

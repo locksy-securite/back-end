@@ -13,5 +13,5 @@ export class User {
   password: string; // sera haché
 
   @Column()
-  creditCard: string; // ⚠️ à chiffrer en vrai projet
+  creditCard: string; // à chiffrer en vrai projet
 }
