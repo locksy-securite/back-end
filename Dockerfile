@@ -3,8 +3,7 @@ FROM node:20 AS build
 WORKDIR /app
 
 # Copier uniquement les fichiers nécessaires pour installer les dépendances,
-COPY package.json ./
-COPY nest-cli.json ./
+COPY package*.json ./
 
 # Installer toutes les dépendances (avec devDependencies pour pouvoir build),
 RUN npm install
@@ -23,10 +22,10 @@ WORKDIR /app
 
 # Installer uniquement les dépendances de prod
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copier les fichiers compilés (dist)
-COPY --from=build /app/dist ./dist
+#COPY --from=build /app/dist ./dist
 
 # Exposer le port
 EXPOSE 5000
