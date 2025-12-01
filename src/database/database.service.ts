@@ -1,12 +1,10 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Pool } from 'pg';
 import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
 config();
 
 @Injectable()
 export class DatabaseService implements OnModuleInit {
-  private pool: Pool;
 
   constructor(private dataSource: DataSource) {}
   
@@ -23,8 +21,8 @@ export class DatabaseService implements OnModuleInit {
 
   async testConnection() {
     try {
-      const res = await this.pool.query('SELECT NOW()');
-      console.log('Connexion PostgreSQL OK:', res.rows[0]);
+      const res = await this.dataSource.query('SELECT NOW()');
+      console.log('Connexion PostgreSQL OK:', res[0]);
     } catch (err) {
       console.error('Erreur de connexion à PostgreSQL:', err);
       throw err;
@@ -32,12 +30,12 @@ export class DatabaseService implements OnModuleInit {
   }
 
   async listTables() {
-    const result = await this.pool.query(
+    const result = await this.dataSource.query(
       "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';"
     );
     console.log(
       'Tables dans la base de données:',
-      result.rows.map((r) => r.table_name),
+      result.map((r: any) => r.table_name),
     );
   }
 
@@ -53,8 +51,12 @@ export class DatabaseService implements OnModuleInit {
 
   async start() {
     try {
-      await this.pool.connect();
-      console.log('Connexion à la base de données PostgreSQL réussie.');
+      if (!this.dataSource.isInitialized) {
+        await this.dataSource.connect();
+        console.log('Connexion à la base de données PostgreSQL réussie.');
+      } else {
+        console.log('Connexion à la base de données PostgreSQL déjà établie.');
+      }
     } catch (err) {
       console.error('Erreur de connexion à PostgreSQL:', err);
     }
