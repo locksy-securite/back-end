@@ -21,10 +21,21 @@ export class DatabaseService implements OnModuleInit {
 
   async testConnection() {
     try {
+<<<<<<< HEAD
       const res = await this.dataSource.query('SELECT NOW()');
       console.log('Connexion PostgreSQL OK:', res[0]);
     } catch (err) {
       console.error('Erreur de connexion à PostgreSQL:', err);
+=======
+      const res = await this.pool.query('SELECT NOW()');
+      console.log('Connexion PostgreSQL OK:', res.rows[0]);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Erreur de connexion à PostgreSQL:', err.message);
+      } else {
+        console.error('Erreur de connexion à PostgreSQL:', err);
+      }
+>>>>>>> 9617e14 ( fix new eslint issue)
       throw err;
     }
   }
@@ -42,8 +53,12 @@ export class DatabaseService implements OnModuleInit {
   async setupDatabase() {
     try {
       console.log('Configuration de la base de données terminée.');
-    } catch (err) {
-      console.error('Erreur lors de la configuration de la base de données:', err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Erreur lors de la configuration de la base de données:', err.message);
+      } else {
+        console.error('Erreur lors de la configuration de la base de données:', err);
+      }
     } finally {
       console.log('Processus de configuration de la base de données terminé.');
     }
@@ -51,6 +66,7 @@ export class DatabaseService implements OnModuleInit {
 
   async start() {
     try {
+<<<<<<< HEAD
       if (!this.dataSource.isInitialized) {
         await this.dataSource.connect();
         console.log('Connexion à la base de données PostgreSQL réussie.');
@@ -59,6 +75,16 @@ export class DatabaseService implements OnModuleInit {
       }
     } catch (err) {
       console.error('Erreur de connexion à PostgreSQL:', err);
+=======
+      await this.pool.connect();
+      console.log('Connexion à la base de données PostgreSQL réussie.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Erreur de connexion à PostgreSQL:', err.message);
+      } else {
+        console.error('Erreur de connexion à PostgreSQL:', err);
+      }
+>>>>>>> 9617e14 ( fix new eslint issue)
     }
 
     await this.listTables();
@@ -68,8 +94,12 @@ export class DatabaseService implements OnModuleInit {
     try {
       await this.dataSource.synchronize();
       console.log('Tables initialisées avec succès via TypeORM.');
-    } catch (err) {
-      console.error('Erreur lors de l’initialisation des tables:', err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Erreur lors de l’initialisation des tables:', err.message);
+      } else {
+        console.error('Erreur lors de l’initialisation des tables:', err);
+      }
     }
    
   } 
