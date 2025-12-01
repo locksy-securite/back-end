@@ -1,6 +1,4 @@
-# Locksy • Back-end React
-
----
+# Locksy • Back-end Nest.js
 
 ### Présentation
 
@@ -32,7 +30,7 @@ Le backend sert ainsi uniquement d’**intermédiaire fiable**, garantissant l�
 
 ### Prérequis
 
--   **Node.js** (version 16+ recommandée)
+-   **Node.js** (version 18+ recommandée)
 -   **npm** (fourni avec Node.js)
 -   Ligne de commande (Terminal, PowerShell, Bash)
 -   Navigateur moderne (Chrome, Edge, Firefox)
