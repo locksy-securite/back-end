@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt, { SignOptions, JwtPayload } from 'jsonwebtoken';
 import { randomBytes, timingSafeEqual } from 'crypto';
 import { Pool, QueryResult } from 'pg';
 
@@ -18,16 +18,17 @@ export class AuthService {
 
   // Accès au pool PostgreSQL
   private get pool(): Pool {
-    return (this.db as any).pool as Pool;
+    // ⚠️ Ici tu peux typer DatabaseService pour éviter le cast
+    return (this.db as unknown as { pool: Pool }).pool;
   }
 
   // Wrapper typé pour toutes les requêtes PostgreSQL
   private async query<T extends object>(
     text: string,
-    params: any[] = []
+    params: unknown[] = []   // ✅ plus sûr que any[]
   ): Promise<QueryResult<T>> {
     const result = await this.pool.query(text, params);
-    return result as QueryResult<T>; // rowCount et rows reconnus
+    return result as QueryResult<T>;
   }
 
   // Génère un sel aléatoire
@@ -37,7 +38,7 @@ export class AuthService {
 
   // Génère un JWT avec expiresIn sûr
   private signToken(payload: Record<string, unknown>): string {
-    const expiresIn: string = this.jwtExpiry?.trim() || '15m'; // Force string
+    const expiresIn: string = this.jwtExpiry?.trim() || '15m';
     return jwt.sign(payload, this.jwtSecret, { expiresIn } as SignOptions);
   }
 
@@ -108,9 +109,9 @@ export class AuthService {
 
   // Rafraîchissement du token
   async refresh(refreshToken: string) {
-    let payload: any;
+    let payload: JwtPayload;   // ✅ utilisation du type fourni par jsonwebtoken
     try {
-      payload = jwt.verify(refreshToken, this.jwtSecret) as any;
+      payload = jwt.verify(refreshToken, this.jwtSecret) as JwtPayload;
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -122,7 +123,7 @@ export class AuthService {
 
     if (r.rows.length === 0) throw new UnauthorizedException('Invalid refresh token');
 
-    const userId = payload.sub;
+    const userId = payload.sub as string;
     const token = this.signToken({ sub: userId });
     return { token };
   }
