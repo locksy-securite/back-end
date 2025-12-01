@@ -11,10 +11,7 @@ export class DatabaseService implements OnModuleInit {
   constructor(private dataSource: DataSource) {}
   
   async onModuleInit() {
-    // Test connexion
     await this.testConnection();
-
-    // Setup DB (équivalent de ton setupDatabase)
     await this.setupDatabase();
 
     // Initialisation des tables
@@ -30,7 +27,7 @@ export class DatabaseService implements OnModuleInit {
       console.log('Connexion PostgreSQL OK:', res.rows[0]);
     } catch (err) {
       console.error('Erreur de connexion à PostgreSQL:', err);
-      throw err; // important si critique
+      throw err;
     }
   }
 
@@ -38,19 +35,21 @@ export class DatabaseService implements OnModuleInit {
     const result = await this.pool.query(
       "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';"
     );
-    console.log('Tables dans la base de données:', result.rows.map(r => r.table_name));
+    console.log(
+      'Tables dans la base de données:',
+      result.rows.map((r) => r.table_name),
+    );
   }
 
   async setupDatabase() {
-  try {
-    // Ici tu mets ta logique de création/migration
-    console.log('Configuration de la base de données terminée.');
-  } catch (err) {
-    console.error('Erreur lors de la configuration de la base de données:', err);
-  } finally {
-    console.log('Processus de configuration de la base de données terminé.');
+    try {
+      console.log('Configuration de la base de données terminée.');
+    } catch (err) {
+      console.error('Erreur lors de la configuration de la base de données:', err);
+    } finally {
+      console.log('Processus de configuration de la base de données terminé.');
+    }
   }
-}
 
   async start() {
     try {
@@ -60,7 +59,6 @@ export class DatabaseService implements OnModuleInit {
       console.error('Erreur de connexion à PostgreSQL:', err);
     }
 
-    // Lister les tables
     await this.listTables();
   }
 
