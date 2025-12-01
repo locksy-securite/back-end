@@ -9,16 +9,15 @@ import { Note } from './entity/note.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.PGHOST || 'localhost',
-      port: parseInt(process.env.PGPORT || '5432', 10),
-      username: process.env.PGUSER || 'postgres',
-      password: process.env.PGPASSWORD || 'postgres',
-      database: process.env.PGDATABASE || 'test',
+      host: process.env.PGHOST,
+      port: parseInt(process.env.PGPORT ?? '5432', 10),
+      username: process.env.PGUSER,
+      password: process.env.PGPASSWORD,
+      database: process.env.PGDATABASE,
       entities: [User, Password, Note], // tu peux ajouter CreditCard si besoin
-      synchronize: false, // ⚠️ false en prod, true seulement en dev
+      synchronize: true,
+      autoLoadEntities: true // ⚠️ false en prod, true seulement en dev
     }),
   ],
-  providers: [...databaseProviders],
-  exports: [...databaseProviders],
 })
 export class DatabaseModule {}
