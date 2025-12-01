@@ -28,7 +28,7 @@ export class UsersService {
     const user = this.usersRepository.create({
       email: dto.email,
       password: hashedPassword,
-      creditCard: dto.creditCard, // ⚠️ à chiffrer avec une lib crypto
+      // creditCard: dto.creditCard, // ⚠️ à chiffrer avec une lib crypto
     });
 
     return this.usersRepository.save(user);
