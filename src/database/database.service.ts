@@ -10,8 +10,6 @@ export class DatabaseService implements OnModuleInit {
   async onModuleInit() {
     await this.testConnection();
     await this.setupDatabase();
-    // Initialisation des tables si nécessaire
-    // await this.initTable();
     await this.start();
   }
 
@@ -33,10 +31,7 @@ export class DatabaseService implements OnModuleInit {
     const result = await this.dataSource.query(
       "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';"
     ) as Array<{ table_name: string }>;
-    console.log(
-      'Tables dans la base de données:',
-      result.map((r) => r.table_name),
-    );
+    console.log('Tables dans la base de données:', result.map((r) => r.table_name));
   }
 
   async setupDatabase() {
@@ -78,9 +73,9 @@ export class DatabaseService implements OnModuleInit {
       console.log('Tables initialisées avec succès via TypeORM.');
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error('Erreur lors de l’initialisation des tables:', err.message);
+        console.error("Erreur lors de l'initialisation des tables:", err.message);
       } else {
-        console.error('Erreur lors de l’initialisation des tables:', err);
+        console.error("Erreur lors de l'initialisation des tables:", err);
       }
     }
   }
