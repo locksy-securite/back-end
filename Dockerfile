@@ -25,7 +25,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 # Copier les fichiers compilés (dist)
-#COPY --from=build /app/dist ./dist
+COPY --from=build /app/dist ./dist
 
 # Exposer le port
 EXPOSE 5000
