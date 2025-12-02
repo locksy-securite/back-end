@@ -27,7 +27,7 @@ RUN npm ci --omit=dev
 # Copier les fichiers compilés (dist)
 COPY --from=build /app/dist ./dist
 
-# Exposer le port (Cloud Run fournit `PORT`, EXPOSE is informational)
+# Exposer le port
 EXPOSE 5000
 
 # Lancer le serveur Nest (JS compilé)
