@@ -15,7 +15,7 @@ export class AuthService {
     this.refreshExpiryDays = Number(process.env.REFRESH_EXP_DAYS ?? 30);
   }
 
-  private async query<T extends object>(sql: string, params: any[] = []) {
+  private async query<T extends object>(sql: string, params: unknown[] = []) {
     return this.db['dataSource'].query(sql, params) as Promise<{ rows: T[] }>;
   }
 
