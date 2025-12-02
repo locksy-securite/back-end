@@ -15,7 +15,6 @@ COPY . .
 RUN npm run build
 
 
-
 # ---- Runtime stage ----
 FROM node:20-alpine
 WORKDIR /app
@@ -25,10 +24,11 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 # Copier les fichiers compilés (dist)
-#COPY --from=build /app/dist ./dist
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
 
-# Exposer le port
-EXPOSE 5000
+# Exposer le port (Cloud Run fournit `PORT`, EXPOSE is informational)
+ENV PORT=3000
 
 # Lancer le serveur Nest (JS compilé)
 CMD ["node", "dist/main.js"]
