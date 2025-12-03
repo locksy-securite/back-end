@@ -57,6 +57,16 @@ cd back-end
 npm install
 ```
 
+Installez dans les outils back-end requis :
+
+```bash
+npm install -g @nestjs/cli
+npm install typeorm
+npm install jsonwebtoken
+npm install bcrypt
+npm install pg
+```
+
 3. Lancer le serveur de développement :
 ```bash
 npm run start:dev
@@ -112,21 +122,13 @@ back-end/
 ---
 
 ### Back-end 
-Voici les commandes requis à installer dans le back-end:
 
-```bash
-npm install -g @nestjs/cli
-npm install typeorm
-npm install jsonwebtoken
-npm install bcrypt
-npm install pg
-```
-Vous aurez besoin d'une base de données comme postgresSQL à installer dans ce lien: https://www.postgresql.org/download/
+Vous aurez besoin d'une base de données comme postgresSQL à installer dans ce lien : https://www.postgresql.org/download/
 
 Configurez votre .env
 ATTENTION : Il faut que les éléments correspondent à votre base de données. 
 
-Exemple de .env: 
+Exemple de .env :  
 ```.env
 # --- Configuration PostgreSQL ---
 
