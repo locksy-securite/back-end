@@ -10,9 +10,9 @@ export class AuthService {
   private refreshExpiryDays: number;
 
   constructor(private readonly db: DatabaseService) {
-    this.jwtSecret = process.env.JWT_SECRET ?? 'change_this_secret';
-    this.jwtExpiry = process.env.JWT_EXPIRY ?? '15m';
-    this.refreshExpiryDays = Number(process.env.REFRESH_EXP_DAYS ?? 30);
+    this.jwtSecret = process.env.JWT_SECRET!;                // secret JWT depuis .env
+    this.jwtExpiry = process.env.JWT_EXPIRATION_TIME!;       // 15 minutes = 900s
+    this.refreshExpiryDays = Number(process.env.REFRESH_EXP_DAYS!); // ex: 30 jours
   }
 
   private async query<T extends object>(sql: string, params: unknown[] = []) {
@@ -24,8 +24,7 @@ export class AuthService {
   }
 
   private signToken(payload: Record<string, unknown>): string {
-    const expiresIn: string = this.jwtExpiry?.trim() || '15m';
-    return jwt.sign(payload, this.jwtSecret, { expiresIn } as SignOptions);
+    return jwt.sign(payload, this.jwtSecret, { expiresIn: this.jwtExpiry } as SignOptions);
   }
 
   async register(email: string, passwordHashHex: string, saltHex: string) {
@@ -76,25 +75,24 @@ export class AuthService {
     return { token, refreshToken };
   }
 
- async createRefreshToken(userId: string) {
-  const token = jwt.sign({ sub: userId, type: 'refresh' }, this.jwtSecret, {
-    expiresIn: `${this.refreshExpiryDays}d`,
-  });
+  async createRefreshToken(userId: string) {
+    const token = jwt.sign({ sub: userId, type: 'refresh' }, this.jwtSecret, {
+      expiresIn: `${this.refreshExpiryDays}d`,
+    });
 
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + this.refreshExpiryDays);
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + this.refreshExpiryDays);
 
-  await this.db['dataSource'].query(
-    `
-    INSERT INTO refresh_tokens(user_id, token, "expiresAt", "createdAt")
-    VALUES ($1, $2, $3, NOW())
-    `,
-    [userId, token, expiresAt],
-  );
+    await this.db['dataSource'].query(
+      `
+      INSERT INTO refresh_tokens(user_id, token, "expiresAt", "createdAt")
+      VALUES ($1, $2, $3, NOW())
+      `,
+      [userId, token, expiresAt],
+    );
 
-  return token;
-}
-
+    return token;
+  }
 
   async refresh(refreshToken: string) {
     let payload: JwtPayload;
