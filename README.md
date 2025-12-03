@@ -57,7 +57,9 @@ cd back-end
 npm install
 ```
 
-Installez dans les outils back-end requis :
+Installez les outils back-end requis :
+
+Vous aurez besoin d'une base de données comme postgresSQL à installer dans ce lien : https://www.postgresql.org/download/
 
 ```bash
 npm install -g @nestjs/cli
@@ -122,8 +124,6 @@ back-end/
 ---
 
 ### Back-end 
-
-Vous aurez besoin d'une base de données comme postgresSQL à installer dans ce lien : https://www.postgresql.org/download/
 
 Configurez votre .env
 ATTENTION : Il faut que les éléments correspondent à votre base de données. 
