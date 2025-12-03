@@ -125,11 +125,16 @@ back-end/
 
 ### Configurez votre .env
 
-Créez un fichier .env et configurez le comme l'exemple ci-dessous. 
-ATTENTION : Il faut que les éléments correspondent à votre base de données. 
+Créez un fichier .env et configurez le comme l'exemple ci-dessous.
+ATTENTION : Il faut que les éléments correspondent à votre base de données et configuration.
 
-Exemple de .env :  
+Exemple de .env :
 ```.env
+# --- Configuration Serveur ---
+
+# Port du serveur Nest.js
+NEST_PORT=3000
+
 # --- Configuration PostgreSQL ---
 
 # Nom d'hôte du serveur de base de données
@@ -146,5 +151,16 @@ PGPASSWORD=MonSuperMotDePasse
 
 # Nom de la base de données
 PGDATABASE=ma_base_de_donnees_app
+
+# --- Configuration JWT ---
+
+# Clé secrète pour signer les tokens JWT (changez cette valeur en production)
+JWT_SECRET=change_this_secret_in_production
+
+# Durée d'expiration des tokens JWT (en secondes, ex: 900 = 15 minutes)
+JWT_EXPIRATION_TIME=900
+
+# Durée d'expiration des tokens de rafraîchissement (en jours, ex: 30)
+REFRESH_EXP_DAYS=30
 ```
 
