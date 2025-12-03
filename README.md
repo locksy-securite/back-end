@@ -123,9 +123,9 @@ back-end/
 ```
 ---
 
-### Back-end 
+### Configurez votre .env
 
-Configurez votre .env
+Créez un fichier .env et configurez le comme l'exemple ci-dessous. 
 ATTENTION : Il faut que les éléments correspondent à votre base de données. 
 
 Exemple de .env :  
