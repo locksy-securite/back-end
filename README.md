@@ -16,6 +16,50 @@ Sur le plan **sécurité**, Locksy suit une logique *zero-knowledge* cohérente 
 
 Le backend sert ainsi uniquement d’**intermédiaire fiable**, garantissant l’intégrité, la cohérence et la sécurité des données, sans jamais accéder aux informations privées des utilisateurs.
 
+### Sécurité Back-End
+
+Locksy est construit avec le principe de *Security by Design*, intégrant des mécanismes défensifs dès la conception pour neutraliser les vecteurs d'attaque courants.
+
+#### 1. Validation des Données
+
+Toute donnée entrante est traitée comme potentiellement hostile par défaut. Locksy utilise les **ValidationPipes** de NestJS pour valider strictement les entrées via des **DTOs (Data Transfer Objects)**.
+
+- **ValidationPipe Global** : Configuré dans `main.ts` pour appliquer automatiquement la validation à tous les contrôleurs.
+- **DTOs avec Décorateurs** : Chaque DTO utilise `class-validator` pour imposer des contraintes strictes :
+  - `@IsEmail()` pour les adresses email.
+  - `@IsString()` et `@IsNotEmpty()` pour les chaînes non vides.
+  - Exemple : `LoginDto` et `RegisterDto` rejettent les objets malformés (comme `{ "$ne": null }` pour les injections NoSQL).
+
+Cela empêche les attaques par pollution de prototype et les injections, en garantissant que seules les données conformes au schéma passent.
+
+#### 2. Stratégie Anti-Injection
+
+Les requêtes sont immunisées contre les injections grâce à une séparation stricte entre code et données.
+
+- **Requêtes SQL Paramétrées** : Toutes les requêtes brutes dans `auth.service.ts` utilisent des placeholders (`$1`, `$2`) et passent les données séparément via un tableau. Exemple :
+  ```typescript
+  const query = 'SELECT id_user FROM users WHERE email = $1';
+  const users = await this.db.query(query, [email]);
+  ```
+  Cela empêche les injections SQL comme `1 OR 1=1`.
+
+- **ORM TypeORM** : Pour les opérations standard, TypeORM gère automatiquement le paramétrage, éliminant les risques liés aux concaténations manuelles.
+
+- **Protection NoSQL** : Bien que le projet utilise PostgreSQL, la validation stricte des DTOs empêche les injections similaires (ex: opérateurs `$ne` dans MongoDB).
+
+#### 3. Gestion des Uploads (Non Applicable)
+
+Le projet Locksy ne permet pas l'upload de fichiers actuellement. Si cette fonctionnalité est ajoutée à l'avenir, les mesures suivantes seront implémentées :
+- Renommage systématique des fichiers avec UUID.
+- Stockage isolé hors de la racine exécutable.
+- Validation par "magic bytes" pour vérifier le type réel du fichier.
+
+#### 4. Mesures Complémentaires
+
+- **Helmet** : Active plus de 10 headers de sécurité HTTP (CSP, HSTS, etc.).
+- **CORS Stricte** : Limite les origines autorisées pour prévenir les requêtes cross-origin malveillantes.
+- **Zero-Knowledge** : Les données sensibles restent chiffrées côté client, le serveur ne les déchiffre jamais.
+
 ---
 
 ### Table des matières
