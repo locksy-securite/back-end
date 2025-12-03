@@ -1,19 +1,19 @@
 
 import { DataSource } from 'typeorm';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { ConfigService } from '@nestjs/config';
 
 export const databaseProviders = [
   {
     provide: 'DATA_SOURCE',
-    useFactory: async () => {
+    inject: [ConfigService],
+    useFactory: async (configService: ConfigService) => {
       const dataSource = new DataSource({
         type: 'postgres',
-        host: process.env.PGHOST,
-        port: parseInt(process.env.PGPORT ?? '5432', 10),
-        username: process.env.PGUSER,
-        password: process.env.PGPASSWORD,
-        database: process.env.PGDATABASE,
+        host: configService.get<string>('PGHOST'),
+        port: parseInt(configService.get<string>('PGPORT') ?? '5432', 10),
+        username: configService.get<string>('PGUSER'),
+        password: configService.get<string>('PGPASSWORD'),
+        database: configService.get<string>('PGDATABASE'),
         ssl: true,
         entities: [
             __dirname + '/../**/*.entity{.ts,.js}',
