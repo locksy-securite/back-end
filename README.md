@@ -109,3 +109,40 @@ back-end/
 ├── tsconfig.build.json
 └── tsconfig.json
 ```
+---
+
+### Back-end 
+Voici les commandes requis à installer dans le back-end:
+
+```bash
+npm install -g @nestjs/cli
+npm install typeorm
+npm install jsonwebtoken
+npm install bcrypt
+npm install pg
+```
+Vous aurez besoin d'une base de données comme postgresSQL à installer dans ce lien: https://www.postgresql.org/download/
+
+Configurez votre .env
+ATTENTION : Il faut que les éléments correspondent à votre base de données. 
+
+Exemple de .env: 
+```.env
+# --- Configuration PostgreSQL ---
+
+# Nom d'hôte du serveur de base de données
+PGHOST=localhost
+
+# Port de connexion (le code utilise 5432 par défaut s'il est omis, mais il est préférable de le définir)
+PGPORT=5432
+
+# Nom d'utilisateur de la base de données
+PGUSER=utilisateur_demo
+
+# Mot de passe de la base de données
+PGPASSWORD=MonSuperMotDePasse
+
+# Nom de la base de données
+PGDATABASE=ma_base_de_donnees_app
+```
+
