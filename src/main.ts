@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
@@ -6,6 +7,9 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  // ValidationPipe global pour valider les DTOs
+  app.useGlobalPipes(new ValidationPipe());
 
   // Active 10+ headers de sécurité d'un coup
   app.use(helmet());
