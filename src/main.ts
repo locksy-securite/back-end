@@ -18,9 +18,7 @@ async function bootstrap() {
   app.enableCors({
     origin: (origin, callback) => {
       const allowedOrigins = [
-        'https://startup.com', // A modifier avec le vrai domaine
-        'https://admin.com',
-        // 'http://localhost:3000', // Uniquement en dev !
+        process.env.ALLOWED_ORIGIN
       ];
 
       if (!origin || allowedOrigins.includes(origin)) {
