@@ -7,21 +7,23 @@ export class JwtAuthGuard implements CanActivate {
   constructor(private readonly configService: ConfigService) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const req = context.switchToHttp().getRequest();
-    const auth = req.headers['authorization'] || req.headers['Authorization'];
-    if (!auth) throw new UnauthorizedException('No token');
+  const req = context.switchToHttp().getRequest();
 
-    const parts = (auth as string).split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') throw new UnauthorizedException('Invalid token');
+  // Récupération du token depuis le cookie
+  const token = req.cookies?.['access_token'];
 
-    const token = parts[1];
-    try {
-      const secret = this.configService.get<string>('JWT_SECRET') ?? 'change_this_secret';
-      const payload = jwt.verify(token, secret);
-      req.user = payload;
-      return true;
-    } catch {
-      throw new UnauthorizedException('Invalid token');
-    }
+  if (!token) throw new UnauthorizedException('No token');
+
+  try {
+    const secret = this.configService.get<string>('JWT_SECRET') ?? 'change_this_secret';
+    const payload = jwt.verify(token, secret);
+
+    req.user = payload; 
+    return true;
+  } catch (err) {
+    console.error('Erreur JWT :', err);
+    throw new UnauthorizedException('Invalid token');
   }
+}
+
 }
