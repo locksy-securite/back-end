@@ -1,5 +1,4 @@
 import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../database/database.service';
 import jwt, { SignOptions, JwtPayload } from 'jsonwebtoken';
 import { randomBytes, timingSafeEqual } from 'crypto';
@@ -12,11 +11,16 @@ export class AuthService {
 
   constructor(
     private readonly db: DatabaseService,
-    private readonly configService: ConfigService,
   ) {
-    this.jwtSecret = this.configService.get<string>('JWT_SECRET')!;                // secret JWT depuis .env
-    this.jwtExpiry = this.configService.get<string>('JWT_EXPIRATION_TIME')!;       // 15 minutes = 900s
-    this.refreshExpiryDays = Number(this.configService.get<string>('REFRESH_EXP_DAYS')!); // ex: 30 jours
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error('JWT_SECRET must be defined!');
+    this.jwtSecret = secret;                // secret JWT depuis .env
+    const expiry = process.env.JWT_EXPIRATION_TIME;
+    if (!expiry) throw new Error('JWT_EXPIRATION_TIME must be defined!');
+    this.jwtExpiry = expiry;       // 15 minutes = 900s
+    const expiryDays = process.env.REFRESH_EXP_DAYS;
+    if (!expiryDays) throw new Error('REFRESH_EXP_DAYS must be defined!');
+    this.refreshExpiryDays = Number(expiryDays); // ex: 30 jours
   }
 
   private async query<T extends object>(sql: string, params: unknown[] = []) {
