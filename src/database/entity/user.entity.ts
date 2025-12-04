@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Note } from './note.entity';
 import { Password } from './password.entity';
+import { RefreshToken } from './refresh-token.entity';
 
 @Entity('users')
 export class User {
@@ -13,8 +14,8 @@ export class User {
   @Column({ type: 'bytea' })
   password_hash: Buffer;
 
-  // @Column({ type: 'bytea' })
-  // salt: Buffer;
+   @Column({ type: 'bytea' })
+   salt: Buffer;
 
   // Relations
   @OneToMany(() => Note, note => note.user, { cascade: true })
@@ -22,6 +23,10 @@ export class User {
 
   @OneToMany(() => Password, password => password.user, { cascade: true })
   passwords: Password[];
+
+@OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
+refreshTokens: RefreshToken[];
+
 
   //  @OneToMany(() => CreditCard, card => card.user, { cascade: true })
   // creditCards: CreditCard[];

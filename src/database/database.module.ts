@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { Password } from './entity/password.entity';
 import { Note } from './entity/note.entity';
+import { RefreshToken } from './entity/refresh-token.entity';
 import { DatabaseService } from './database.service';
 
 @Module({
@@ -14,10 +15,10 @@ import { DatabaseService } from './database.service';
       username: process.env.PGUSER,
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
-      entities: [User, Password, Note], // tu peux ajouter CreditCard si besoin
+      entities: [User, Password, Note, RefreshToken], // tu peux ajouter CreditCard si besoin
       synchronize: true,
       autoLoadEntities: true, //  false en prod, true seulement en dev
-      ssl: true,
+      ssl: false,
     }),
   ],
   providers: [DatabaseService],

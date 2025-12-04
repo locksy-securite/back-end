@@ -23,7 +23,7 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: LoginDto) {
     const res = await this.auth.login(body.email, body.passwordHash);
-    return res; // { token, refreshToken }
+    return res; 
   }
 
   @Post('refresh-token')
