@@ -18,7 +18,7 @@ import { DatabaseService } from './database.service';
       entities: [User, Password, Note, RefreshToken], // tu peux ajouter CreditCard si besoin
       synchronize: true,
       autoLoadEntities: true, //  false en prod, true seulement en dev
-      ssl: true,
+      ssl: { rejectUnauthorized: false,},
     }),
   ],
   providers: [DatabaseService],
