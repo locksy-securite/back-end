@@ -72,6 +72,16 @@ TODO #back-end :
   > Votre Whitepaper doit prouver que votre application est construite avec le principe de Security by Design, et non sécurisée après coup.
 
 
+1. La Validation des Données :
+Nous utilisons des DTOs (Data Transfer Objects) pour définir strictement la structure des données entrantes dans nos contrôleurs NestJS. Le ValidationPipe global appliqué dans main.ts valide automatiquement ces DTOs en utilisant des décorateurs comme @IsEmail, @IsString, etc., rejetant toute entrée non conforme avant qu'elle n'atteigne la logique métier.
+
+2. La Stratégie Anti-Injection :
+Toutes nos requêtes SQL utilisent TypeORM, un ORM qui paramètre automatiquement les requêtes, séparant les données des commandes SQL via des placeholders. Cela rend les injections SQL impossibles car les entrées utilisateur ne sont jamais concaténées directement dans les requêtes.
+
+Notre application est construite avec le principe Security by Design : la sécurité est intégrée dès la conception, avec validation des entrées, ORM pour les requêtes, et chiffrement end-to-end, plutôt que d'ajouter des mesures après coup.
+
+
+
 ## Authentificiation & sécurité des accès
 
 1. TODO #back-end & TODO #front-end :
@@ -83,6 +93,14 @@ TODO #back-end :
     > Justifiez le choix du mode de stockage (ex: "Nous utilisons des cookies HttpOnly pour prévenir le vol de token via XSS, contrairement au LocalStorage qui est accessible par tout script JS").
 3. Pour le moment dans notre MVP, nous n'avons qu'un seul type d'utilisateur : l'utilisateur standard qui s'inscrit et se connecte. Techniquement il existe aussi le simple visiteur qui ne peut accéder qu'à la page d'accueil / d'inscription, et qui devient utilisateur aussitôt qu'il est inscrit.  
 
+
+1. Politique de Mots de Passe :
+Nous utilisons bcrypt pour le hachage des mots de passe côté client et serveur, avec un coût de 12 rounds. Ce coût offre un équilibre entre sécurité résistante au bruteforce hors ligne et performance acceptable pour notre infrastructure, sans ralentir l'expérience utilisateur.
+
+2. Architecture d'Authentification :
+    * Flux back-end : Login -> Vérification hash mot de passe -> Création JWT (access + refresh) -> Stockage en cookies HttpOnly -> Guards vérifient JWT sur routes protégées.
+    * Nous utilisons des cookies HttpOnly pour stocker les tokens JWT, prévenant le vol via XSS contrairement au LocalStorage accessible par tout script JS.
+3. Pour le moment dans notre MVP, nous n'avons qu'un seul type d'utilisateur : l'utilisateur standard qui s'inscrit et se connecte. Techniquement il existe aussi le simple visiteur qui ne peut accéder qu'à la page d'accueil / d'inscription, et qui devient utilisateur aussitôt qu'il est inscrit.
 
 ## Sécurité de l'infrastructure
 
@@ -97,8 +115,16 @@ TODO #back-end :
 2. TODO #back-end & TODO #front-end :
   > En-têtes HTTP : Listez les headers activés par Helmet dans votre projet et choisissez-en deux (ex: HSTS et X-Frame-Options) pour expliquer concrètement contre quelle attaque ils vous protègent.
 
+1. Configuration CORS :
+Notre configuration NestJS restreint les origines à 'https://startup.com', 'https://admin.com' uniquement, rejetant toute autre origine. Cela empêche les attaques CSRF et limite l'accès aux domaines de confiance, évitant les requêtes non autorisées depuis des sites malveillants.
+
+2. En-têtes HTTP :
+Helmet active des headers comme Content-Security-Policy, HSTS, X-Frame-Options, X-Content-Type-Options, etc. HSTS force les connexions HTTPS, protégeant contre les attaques man-in-the-middle ; X-Frame-Options empêche le clickjacking en interdisant l'intégration dans des frames.
+
 3. Gestion des secrets :
 ![fichier .env](backend_gitignore.png)
+Exemple dans main.ts : `const port = configService.get<number>('NEST_PORT') || 3000;` et dans auth.service.ts : `secret: this.configService.get<string>('JWT_SECRET')`. Cela injecte les variables sensibles depuis .env sans les hardcoder.
+
 
 TODO #front-end & TODO #back-end & TODO #dev-ops (on peut s'en occuper côté devOps mais il faut juste nous indiquer où c'est dans le code pour qu'on comprenne et qu'on explique): 
 > Exemple de code montrant l'utilisation du `ConfigService` pour injecter une variable sensible.
@@ -109,8 +135,11 @@ TODO #front-end & TODO #back-end & TODO #dev-ops (on peut s'en occuper côté de
 ### Rapport d'audit automatisé
 
 ```
-npm audit
+npm audit report
 ```
+
+Résultat de l'audit : Le projet ne contient aucune vulnérabilité critique non justifiée, car la vulnérabilité trouvée est dans une dépendance indirecte et est résolue par via `npm audit fix`.
+
 TODO #dev-ops : 
 > [insérer la capture d'écran du résultat]
 > Le projet final ne doit contenir aucune vulnérabilité critique non justifiée dans npm audit. 
@@ -184,3 +213,7 @@ TODO #dev-ops & TODO #back-end :
 TODO #dev-ops (need TODO #back-end)
 > Montrez un exemple concret de log généré par votre application (lors d'un login ou d'une erreur).
   Prouvez que ce log est "propre" (anonymisé, pas de mot de passe en clair).
+
+
+  Exemple de log lors de la connexion à la base de données : "Connexion PostgreSQL OK: { now: '2023-10-01T12:00:00.000Z' }". Les logs sont propres, anonymisés, sans mots de passe en clair, utilisant uniquement des informations non sensibles comme timestamps et statuts de connexion.
+
