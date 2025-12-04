@@ -29,6 +29,7 @@ async function bootstrap() {
     credentials: true, // Autorise les cookies sécurisés
   });
 
+  app.setGlobalPrefix('api'); 
   const port = process.env.PORT || process.env.NEST_PORT || 3000;
   await app.listen(port);
   console.log(`Serveur NestJS démarré sur le port ${port}`);
