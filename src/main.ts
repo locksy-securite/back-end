@@ -2,11 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
-import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
 
   // ValidationPipe global pour valider les DTOs
   app.useGlobalPipes(new ValidationPipe());
@@ -31,7 +29,7 @@ async function bootstrap() {
     credentials: true, // Autorise les cookies sécurisés
   });
 
-  const port = configService.get<number>('NEST_PORT') || 3000;
+  const port = process.env.PORT || process.env.NEST_PORT || 3000;
   await app.listen(port);
   console.log(`Serveur NestJS démarré sur le port ${port}`);
 }
