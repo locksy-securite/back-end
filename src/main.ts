@@ -14,10 +14,21 @@ async function bootstrap() {
 
   // Configuration CORS sécurisée
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGIN, 
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true, // Autorise les cookies sécurisés
+    origin: (origin, callback) => {
+      const allowed = [
+        process.env.ALLOWED_ORIGIN?.replace(/\/$/, ''),
+        (process.env.ALLOWED_ORIGIN || '') + '/'
+      ];
+  
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS not allowed for ${origin}`));
+      }
+    },
+    credentials: true,
   });
+
 
   app.setGlobalPrefix('api'); 
   const port = process.env.PORT || process.env.NEST_PORT || 3000;
