@@ -15,7 +15,7 @@ async function bootstrap() {
   // Configuration CORS sécurisée
   app.enableCors({
     origin: process.env.ALLOWED_ORIGIN, 
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true, // Autorise les cookies sécurisés
   });
 
