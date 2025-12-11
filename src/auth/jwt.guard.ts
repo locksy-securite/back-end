@@ -7,23 +7,28 @@ export class JwtAuthGuard implements CanActivate {
   constructor(private readonly configService: ConfigService) {}
 
   canActivate(context: ExecutionContext): boolean {
-  const req = context.switchToHttp().getRequest();
+    const req = context.switchToHttp().getRequest();
 
-  // Récupération du token depuis le cookie
-  const token = req.cookies?.['access_token'];
+    //  Récupération du token depuis le header Authorization
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) throw new UnauthorizedException('No Authorization header');
 
-  if (!token) throw new UnauthorizedException('No token');
+    // Format attendu : "Bearer <token>"
+    const [scheme, token] = authHeader.split(' ');
+    if (scheme !== 'Bearer' || !token) {
+      throw new UnauthorizedException('Invalid Authorization format');
+    }
 
-  try {
-    const secret = this.configService.get<string>('JWT_SECRET') ?? 'change_this_secret';
-    const payload = jwt.verify(token, secret);
+    try {
+      const secret = this.configService.get<string>('JWT_SECRET') ?? 'change_this_secret';
+      const payload = jwt.verify(token, secret);
 
-    req.user = payload; 
-    return true;
-  } catch (err) {
-    console.error('Erreur JWT :', err);
-    throw new UnauthorizedException('Invalid token');
+      // Attacher le payload au req.user pour l’utiliser dans les contrôleurs
+      req.user = payload;
+      return true;
+    } catch (err) {
+      console.error('Erreur JWT :', err);
+      throw new UnauthorizedException('Invalid token');
+    }
   }
-}
-
 }

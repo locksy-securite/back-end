@@ -24,32 +24,50 @@ export class AuthService {
   }
 
   // Récupérer le salt pour le hash côté front
-  async getSalt(userId: string, email: string): Promise<string | null> {
+  async getSalt(email: string): Promise<string | null> {
   const r = await this.query(
-    'SELECT salt FROM users WHERE id_user = $1 AND email = $2',
-    [userId, email],
+    'SELECT salt FROM users WHERE email = $1',
+    [email],
   );
   if (r.length === 0) return null;
-  return r[0].salt.toString('hex');
+  console.log('Salt buffer:', r[0].salt);
+  return r[0].salt.toString('base64');
 }
 
 
   // Register : on stocke le hash et le salt envoyés par le front
-  async register(email: string, passwordHashHex: string, saltHex: string) {
+  async register(email: string, passwordHashHex: string, saltHex: string, envelope: { type: 'registration'; aad_json: any; data_b64: string }) {
     const r = await this.query('SELECT id_user FROM users WHERE email = $1', [email]);
     if (r.length > 0) throw new ConflictException('User already exists');
 
     await this.query(
       `INSERT INTO users(email, password_hash, salt)
        VALUES ($1::text, $2::bytea, $3::bytea)`,
-      [email, Buffer.from(passwordHashHex, 'hex'), Buffer.from(saltHex, 'hex')],
+      [email, Buffer.from(passwordHashHex, 'base64'), Buffer.from(saltHex, 'base64')],
     );
 
-    return { ok: true };
+    // Creer un  user ID
+    const userResult = await this.query('SELECT id_user FROM users WHERE email = $1', [email]);
+    const userId = userResult[0].id_user;
+
+    // Inserer l envelope
+    await this.query(
+      `INSERT INTO envelopes(id_user, type, aad_json, data_b64)
+       VALUES ($1, $2, $3, $4)`,
+      [userId, 'registration', JSON.stringify(envelope.aad_json), envelope.data_b64],
+    );
+
+    //Creer un  token
+    const token = this.signToken({ sub: userId });
+
+    //Creer un  refresh token
+    const refreshToken = await this.createRefreshToken(userId);
+
+    return { accessToken: token, refreshToken };
   }
 
   // Login : vérifie que le hash côté front correspond au hash en DB
-  async login(email: string, passwordHashHex: string) {
+  async login(email: string, passwordHashHex: string, envelope: { type: 'login'; aad_json: any; data_b64: string }) {
     const r = await this.query(
       'SELECT id_user, password_hash FROM users WHERE email = $1',
       [email],
@@ -58,7 +76,7 @@ export class AuthService {
     if (r.length === 0) throw new UnauthorizedException('Invalid credentials');
 
     const stored = r[0].password_hash;
-    const incoming = Buffer.from(passwordHashHex, 'hex');
+    const incoming = Buffer.from(passwordHashHex, 'base64');
 
     if (stored.length !== incoming.length || !timingSafeEqual(stored, incoming)) {
       throw new UnauthorizedException('Invalid credentials');
@@ -66,13 +84,23 @@ export class AuthService {
 
     const userId = r[0].id_user;
 
+    // Creer un  access token
     const token = this.signToken({ sub: userId });
+
+    // Creer un  refresh token
     const refreshToken = await this.createRefreshToken(userId);
 
-    return { token, refreshToken };
+    // Inserer envelope
+    await this.query(
+      `INSERT INTO envelopes(id_user, type, aad_json, data_b64)
+       VALUES ($1, $2, $3, $4)`,
+      [userId, 'login', JSON.stringify(envelope.aad_json), envelope.data_b64],
+    );
+
+    return { accessToken: token, refreshToken };
   }
 
-  // Crée un JWT
+  // Créer un JWT
   private signToken(payload: Record<string, unknown>): string {
     return jwt.sign(payload, this.jwtSecret, { expiresIn: this.jwtExpiry } as SignOptions);
   }
@@ -123,7 +151,7 @@ export class AuthService {
     // Crée un nouvel access token
     const token = this.signToken({ sub: userId });
 
-    return { token, refreshToken: newRefreshToken };
+    return { accessToken: token, refreshToken: newRefreshToken };
   }
 
   // Logout : supprime le refresh token
