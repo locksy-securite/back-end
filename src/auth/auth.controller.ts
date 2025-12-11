@@ -74,7 +74,7 @@ async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
   
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async logout(@Req() req: Request) {
     const refreshToken = req.headers['x-refresh-token'] as string;
     if (refreshToken) await this.auth.logout(refreshToken);
 

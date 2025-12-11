@@ -36,7 +36,7 @@ export class AuthService {
 
 
   // Register : on stocke le hash et le salt envoyés par le front
-  async register(email: string, passwordHashHex: string, saltHex: string, envelope: { type: 'registration'; aad_json: any; data_b64: string }) {
+  async register(email: string, passwordHashHex: string, saltHex: string, envelope: { type: 'registration'; aad_json: Record<string, unknown>; data_b64: string }) {
     const r = await this.query('SELECT id_user FROM users WHERE email = $1', [email]);
     if (r.length > 0) throw new ConflictException('User already exists');
 
@@ -67,7 +67,7 @@ export class AuthService {
   }
 
   // Login : vérifie que le hash côté front correspond au hash en DB
-  async login(email: string, passwordHashHex: string, envelope: { type: 'login'; aad_json: any; data_b64: string }) {
+  async login(email: string, passwordHashHex: string, envelope: { type: 'login'; aad_json: Record<string, unknown>; data_b64: string }) {
     const r = await this.query(
       'SELECT id_user, password_hash FROM users WHERE email = $1',
       [email],

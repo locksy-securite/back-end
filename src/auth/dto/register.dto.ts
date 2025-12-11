@@ -4,7 +4,7 @@ export class RegisterDto {
   salt!: string; // hex string
   envelope!: {
     type: 'registration';
-    aad_json: any;
+    aad_json: Record<string, unknown>;
     data_b64: string;
   };
 }

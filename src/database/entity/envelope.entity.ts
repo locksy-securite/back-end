@@ -15,7 +15,7 @@ export class Envelope {
   type: EnvelopeType;
 
   @Column({ type: 'jsonb' })
-  aad_json: any;
+  aad_json: Record<string, unknown>;
 
   @Column({ type: 'text' })
   data_b64: string;
