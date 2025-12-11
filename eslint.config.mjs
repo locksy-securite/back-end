@@ -19,7 +19,12 @@ export default tseslint.config(
       },
     },
     rules: {
-      // your custom rules here
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-new-func': 'error',
+      'no-unsafe-finally': 'error',
+      'no-constant-condition': 'warn',
+      'no-script-url': 'error',
     },
   }
 );

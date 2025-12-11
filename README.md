@@ -206,5 +206,10 @@ JWT_EXPIRATION_TIME=900
 
 # Durée d'expiration des tokens de rafraîchissement (en jours, ex: 30)
 REFRESH_EXP_DAYS=30
+
+# --- Configuration CORS ---
+
+# exmeple en local
+ALLOWED_ORIGIN=http://localhost:3000
 ```
 
