@@ -3,9 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
-import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
-import csrf from 'csrf';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
