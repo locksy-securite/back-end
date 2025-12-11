@@ -23,7 +23,8 @@ export class PasswordsController {
   async findAll(@Req() req: RequestWithUser) {
     const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('User not found');
-    return await this.passwordsService.findAll(userId);
+    const passwords = await this.passwordsService.findAll(userId);
+    return passwords.map(p => ({ ...p, secret: p.secret.toString('base64') }));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -31,7 +32,8 @@ export class PasswordsController {
   async findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
     const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('User not found');
-    return await this.passwordsService.findOne(id, userId);
+    const password = await this.passwordsService.findOne(id, userId);
+    return { ...password, secret: password.secret.toString('base64') };
   }
 
   @UseGuards(JwtAuthGuard)

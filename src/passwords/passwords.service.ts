@@ -39,7 +39,7 @@ export class PasswordsService {
     const password = await this.findOne(id, userId);
     if (updatePasswordDto.name !== undefined) password.name = updatePasswordDto.name;
     if (updatePasswordDto.username !== undefined) password.username = updatePasswordDto.username;
-    if (updatePasswordDto.secret !== undefined) password.secret = Buffer.from(updatePasswordDto.secret, 'hex');
+    if (updatePasswordDto.secret !== undefined) password.secret = Buffer.from(updatePasswordDto.secret, 'base64');
     return await this.passwordRepository.save(password);
   }
 
