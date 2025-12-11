@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Note } from './note.entity';
 import { Password } from './password.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { Envelope } from './envelope.entity';
 
 @Entity('users')
 export class User {
@@ -27,6 +28,8 @@ export class User {
 @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
 refreshTokens: RefreshToken[];
 
+@OneToMany(() => Envelope, envelope => envelope.user, { cascade: true })
+envelopes: Envelope[];
 
   //  @OneToMany(() => CreditCard, card => card.user, { cascade: true })
   // creditCards: CreditCard[];
