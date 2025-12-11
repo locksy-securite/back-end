@@ -10,7 +10,7 @@ export class LoginDto {
 
   envelope!: {
     type: 'login';
-    aad_json: any;
+    aad_json: Record<string, unknown>;
     data_b64: string;
   };
 }
