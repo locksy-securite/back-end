@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
+import csrf from 'csrf';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,16 +16,26 @@ async function bootstrap() {
 
   // Active 10+ headers de sécurité d'un coup
   app.use(helmet());
-  // Middleware pour parser les cookies
-  app.use(cookieParser());
+
+  // Rate limiting pour les endpoints d'authentification
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 tentatives par fenêtre
+    message: 'Trop de tentatives de connexion, réessayez dans 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  // Appliquer le rate limiting aux routes d'auth
+  app.use('/auth/login', authLimiter);
+ app.use('/auth/register', authLimiter);
 
   // Configuration CORS sécurisée
   app.enableCors({
     origin: (origin, callback) => {
       const allowedOrigins = [
-        'https://startup.com', // A modifier avec le vrai domaine
+        'http://localhost:5173', // A modifier avec le vrai domaine
         'https://admin.com',
-        // 'http://localhost:3000', // Uniquement en dev !
       ];
 
       if (!origin || allowedOrigins.includes(origin)) {
