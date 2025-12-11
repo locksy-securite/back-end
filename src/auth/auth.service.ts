@@ -156,7 +156,10 @@ export class AuthService {
 
   // Logout : supprime le refresh token
   async logout(refreshToken: string) {
-    await this.query('DELETE FROM refresh_tokens WHERE token = $1', [refreshToken]);
+    await this.db['dataSource'].query(
+      'DELETE FROM refresh_tokens WHERE token = $1',
+      [refreshToken],
+    );
     return { ok: true };
   }
 }
