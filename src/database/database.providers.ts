@@ -1,4 +1,3 @@
-
 import { DataSource } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
@@ -16,7 +15,7 @@ export const databaseProviders = [
         database: configService.get<string>('PGDATABASE'),
         ssl: true,
         entities: [
-            __dirname + '/../**/*.entity{.ts,.js}',
+          __dirname + '/../**/*.entity{.ts,.js}',
         ],
         synchronize: true,
       });
