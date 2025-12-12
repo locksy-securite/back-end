@@ -2,9 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
+import { ConfigService } from '@nestjs/config';
+import rateLimit from 'express-rate-limit';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
   // ValidationPipe global pour valider les DTOs
   app.useGlobalPipes(new ValidationPipe());
@@ -12,25 +16,50 @@ async function bootstrap() {
   // Active 10+ headers de sécurité d'un coup
   app.use(helmet());
 
+  // Rate limiting pour les endpoints d'authentification
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 tentatives par fenêtre
+    message: 'Trop de tentatives de connexion, réessayez dans 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  // Appliquer le rate limiting aux routes d'auth
+  app.use('/auth/login', authLimiter);
+ app.use('/auth/register', authLimiter);
+
   // Configuration CORS sécurisée
   app.enableCors({
     origin: (origin, callback) => {
-      const allowed = [
-        process.env.ALLOWED_ORIGIN?.replace(/\/$/, ''),
-        (process.env.ALLOWED_ORIGIN || '') + '/'
+      const allowedOrigins = [
+        'http://localhost:5173', // A modifier avec le vrai domaine
+        'https://admin.com',
       ];
-  
-      if (!origin || allowed.includes(origin)) {
+
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error(`CORS not allowed for ${origin}`));
+        callback(new Error('Not allowed by CORS'));
       }
     },
-    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // Autorise les cookies sécurisés
   });
 
-  const port = process.env.PORT || process.env.NEST_PORT || 3000;
-  await app.listen(port, '0.0.0.0');
+  // Ajout du document Swagger pour l'API
+  const config = new DocumentBuilder()
+    .setTitle('Gestion MDP API')
+    .setDescription('API pour la gestion des mots de passe')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
+  const port = configService.get<number>('NEST_PORT') || 3000;
+  await app.listen(port);
   console.log(`Serveur NestJS démarré sur le port ${port}`);
 }
 bootstrap();

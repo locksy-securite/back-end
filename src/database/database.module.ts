@@ -5,6 +5,7 @@ import { Password } from './entity/password.entity';
 import { Note } from './entity/note.entity';
 import { RefreshToken } from './entity/refresh-token.entity';
 import { DatabaseService } from './database.service';
+import { Envelope } from './entity/envelope.entity';
 
 @Module({
   imports: [
@@ -15,10 +16,10 @@ import { DatabaseService } from './database.service';
       username: process.env.PGUSER,
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
-      entities: [User, Password, Note, RefreshToken], // tu peux ajouter CreditCard si besoin
+      entities: [User, Password, Note, RefreshToken,Envelope], // tu peux ajouter CreditCard si besoin
       synchronize: true,
       autoLoadEntities: true, //  false en prod, true seulement en dev
-      ssl: { rejectUnauthorized: false,},
+      ssl: false,
     }),
   ],
   providers: [DatabaseService],

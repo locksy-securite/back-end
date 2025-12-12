@@ -1,25 +1,33 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
+  constructor(private readonly configService: ConfigService) {}
 
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();
-    const auth = req.headers['authorization'] || req.headers['Authorization'];
-    if (!auth) throw new UnauthorizedException('No token');
 
-    const parts = (auth as string).split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') throw new UnauthorizedException('Invalid token');
+    //  Récupération du token depuis le header Authorization
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) throw new UnauthorizedException('No Authorization header');
 
-    const token = parts[1];
+    // Format attendu : "Bearer <token>"
+    const [scheme, token] = authHeader.split(' ');
+    if (scheme !== 'Bearer' || !token) {
+      throw new UnauthorizedException('Invalid Authorization format');
+    }
+
     try {
-      const secret = process.env.JWT_SECRET;
-      if (!secret) throw new Error('JWT_SECRET must be defined!');
+      const secret = this.configService.get<string>('JWT_SECRET') ?? 'change_this_secret';
       const payload = jwt.verify(token, secret);
+
+      // Attacher le payload au req.user pour l’utiliser dans les contrôleurs
       req.user = payload;
       return true;
-    } catch {
+    } catch (err) {
+      console.error('Erreur JWT :', err);
       throw new UnauthorizedException('Invalid token');
     }
   }
