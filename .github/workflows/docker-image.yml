@@ -1,4 +1,4 @@
-name: Build and push Docker image
+name: Build, push and deploy Docker image
  
 on:
   push:
@@ -36,4 +36,18 @@ jobs:
             ghcr.io/locksy-securite/back-end:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
- 
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy back-end \
+            --image ghcr.io/locksy-securite/back-end:latest \
+            --region europe-west1 \
+            --platform managed \
+            --allow-unauthenticated
