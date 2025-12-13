@@ -1,5 +1,4 @@
 import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../database/database.service';
 import jwt, { SignOptions, JwtPayload } from 'jsonwebtoken';
 import { timingSafeEqual } from 'crypto';
@@ -12,11 +11,10 @@ export class AuthService {
 
   constructor(
     private readonly db: DatabaseService,
-    private readonly config: ConfigService,
   ) {
-    this.jwtSecret = this.config.get<string>('JWT_SECRET')!;
-    this.jwtExpiry = this.config.get<string>('JWT_EXPIRATION_TIME')!;  // ex: "15m"
-    this.refreshExpiryDays = Number(this.config.get<string>('REFRESH_EXP_DAYS')!); // ex: 7
+    this.jwtSecret = process.env.JWT_SECRET!;
+    this.jwtExpiry = process.env.JWT_EXPIRATION_TIME!;  // ex: "15m"
+    this.refreshExpiryDays = Number(process.env.REFRESH_EXP_DAYS!); // ex: 7
   }
 
   private async query(sql: string, params: unknown[] = []) {
@@ -30,7 +28,6 @@ export class AuthService {
     [email],
   );
   if (r.length === 0) return null;
-  console.log('Salt buffer:', r[0].salt);
   return r[0].salt.toString('base64');
 }
 
@@ -133,12 +130,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // Vérifie que le refresh token existe
+    // Vérifie que le refresh token existe et n'est pas expiré en base
     const r = await this.query(
-      'SELECT id, user_id FROM refresh_tokens WHERE token = $1',
+      'SELECT id, user_id FROM refresh_tokens WHERE token = $1 AND "expiresAt" > NOW()',
       [oldRefreshToken],
     );
-    if (r.length === 0) throw new UnauthorizedException('Invalid refresh token');
+    if (r.length === 0) throw new UnauthorizedException('Invalid or expired refresh token');
 
     const userId = payload.sub as string;
 
