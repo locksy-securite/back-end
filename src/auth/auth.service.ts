@@ -1,5 +1,4 @@
 import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../database/database.service';
 import jwt, { SignOptions, JwtPayload } from 'jsonwebtoken';
 import { timingSafeEqual } from 'crypto';
@@ -12,11 +11,10 @@ export class AuthService {
 
   constructor(
     private readonly db: DatabaseService,
-    private readonly config: ConfigService,
   ) {
-    this.jwtSecret = this.config.get<string>('JWT_SECRET')!;
-    this.jwtExpiry = this.config.get<string>('JWT_EXPIRATION_TIME')!;  // ex: "15m"
-    this.refreshExpiryDays = Number(this.config.get<string>('REFRESH_EXP_DAYS')!); // ex: 7
+    this.jwtSecret = process.env.JWT_SECRET!;
+    this.jwtExpiry = process.env.JWT_EXPIRATION_TIME!;  // ex: "15m"
+    this.refreshExpiryDays = Number(process.env.REFRESH_EXP_DAYS!); // ex: 7
   }
 
   private async query(sql: string, params: unknown[] = []) {

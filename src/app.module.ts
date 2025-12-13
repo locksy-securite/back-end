@@ -1,5 +1,4 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PasswordsModule } from './passwords/passwords.module';
 import { NotesModule } from './notes/notes.module';
@@ -8,9 +7,6 @@ import { CsrfMiddleware } from './csrf.middleware';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true, // Disponible partout
-    }),
     AuthModule,
     PasswordsModule,
     NotesModule,

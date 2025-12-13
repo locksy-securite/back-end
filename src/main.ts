@@ -2,13 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
-import { ConfigService } from '@nestjs/config';
 import rateLimit from 'express-rate-limit';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
 
   // ValidationPipe global pour valider les DTOs
   app.useGlobalPipes(new ValidationPipe());
@@ -30,12 +28,12 @@ app.use('/auth/login', authLimiter);
 app.use('/auth/register', authLimiter);
 
   // Configuration CORS sécurisée
-  const corsOrigin = configService.get<string>('CORS_ORIGIN') ;
+  const corsOrigin = process.env.CORS_ORIGIN;
   app.enableCors({
     origin: (origin, callback) => {
       const allowedOrigins = [
         corsOrigin,
-        'http://localhost:5000', 
+        'http://localhost:5000',
       ];
 
       if (!origin || allowedOrigins.includes(origin)) {
@@ -68,7 +66,7 @@ app.use('/auth/register', authLimiter);
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document); // Swagger dispo sur /api
 
-  const port = configService.get<number>('NEST_PORT') || 3001;
+  const port = parseInt(process.env.NEST_PORT || '3001', 10);
   await app.listen(port);
   console.log(`Serveur NestJS démarré sur le port ${port}`);
 }
