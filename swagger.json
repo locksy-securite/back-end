@@ -1,0 +1,207 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "MediTrack Core API",
+    "version": "1.0.0",
+    "description": "Documentation de l’API sécurisée MediTrack"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "responses": {
+          "200": {
+            "description": "User registered successfully"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login a user",
+        "responses": {
+          "200": {
+            "description": "User logged in successfully"
+          }
+        }
+      }
+    },
+    "/auth/salt": {
+      "get": {
+        "summary": "Get salt for a given username",
+        "responses": {
+          "200": {
+            "description": "Salt retrieved successfully"
+          }
+        }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "summary": "Refresh JWT token",
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout a user",
+        "responses": {
+          "200": {
+            "description": "User logged out successfully"
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "summary": "Get current user info",
+        "responses": {
+          "200": {
+            "description": "User info retrieved successfully"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete current user",
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          }
+        }
+      }
+    },
+    "/passwords": {
+      "post": {
+        "summary": "Add a new password entry",
+        "responses": {
+          "200": {
+            "description": "Password entry added successfully"
+          }
+        }
+      }
+    },
+    "/passwords/{id}": {
+      "put": {
+        "summary": "Update a password entry",
+        "responses": {
+          "200": {
+            "description": "Password entry updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a password entry",
+        "responses": {
+          "200": {
+            "description": "Password entry deleted successfully"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a password entry",
+        "responses": {
+          "200": {
+            "description": "Password entry retrieved successfully"
+          }
+        }
+      }
+    },
+    "/notes": {
+      "post": {
+        "summary": "Add a new note",
+        "responses": {
+          "200": {
+            "description": "Note added successfully"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all notes",
+        "responses": {
+          "200": {
+            "description": "Notes retrieved successfully"
+          }
+        }
+      }
+    },
+    "/notes/{id}": {
+      "put": {
+        "summary": "Update a note",
+        "responses": {
+          "200": {
+            "description": "Note updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a note",
+        "responses": {
+          "200": {
+            "description": "Note deleted successfully"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a note",
+        "responses": {
+          "200": {
+            "description": "Note retrieved successfully"
+          }
+        }
+      }
+    },
+    "/credit-cards": {
+      "post": {
+        "summary": "Add a new credit card",
+        "responses": {
+          "200": {
+            "description": "Credit card added successfully"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all credit cards",
+        "responses": {
+          "200": {
+            "description": "Credit cards retrieved successfully"
+          }
+        }
+      }
+    },
+    "/credit-cards/{id}": {
+      "put": {
+        "summary": "Update a credit card",
+        "responses": {
+          "200": {
+            "description": "Credit card updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a credit card",
+        "responses": {
+          "200": {
+            "description": "Credit card deleted successfully"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a credit card",
+        "responses": {
+          "200": {
+            "description": "Credit card retrieved successfully"
+          }
+        }
+      }
+    }
+  }
+}
