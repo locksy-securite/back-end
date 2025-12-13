@@ -10,8 +10,8 @@ export class User {
   email: string;
 
   @Column()
-  password: string; // sera haché
+  password: string; 
 
   @Column()
-  creditCard: string; // à chiffrer en vrai projet
+  creditCard: string; 
 }
