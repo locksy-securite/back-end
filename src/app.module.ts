@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PasswordsModule } from './passwords/passwords.module';
 import { NotesModule } from './notes/notes.module';
-import { UserModule, UsersModule } from './users/users.module';
+import { UsersModule } from './users/users.module';
+import { CsrfMiddleware } from './csrf.middleware';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -12,7 +14,12 @@ import { UserModule, UsersModule } from './users/users.module';
     AuthModule,
     PasswordsModule,
     NotesModule,
-   UsersModule,
+    UsersModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Appliquer le middleware CSRF globalement à toutes les routes
+    consumer.apply(CsrfMiddleware).forRoutes('*');
+  }
+}
