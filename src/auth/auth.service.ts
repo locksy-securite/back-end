@@ -30,7 +30,6 @@ export class AuthService {
     [email],
   );
   if (r.length === 0) return null;
-  console.log('Salt buffer:', r[0].salt);
   return r[0].salt.toString('base64');
 }
 
@@ -133,12 +132,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // Vérifie que le refresh token existe
+    // Vérifie que le refresh token existe et n'est pas expiré en base
     const r = await this.query(
-      'SELECT id, user_id FROM refresh_tokens WHERE token = $1',
+      'SELECT id, user_id FROM refresh_tokens WHERE token = $1 AND "expiresAt" > NOW()',
       [oldRefreshToken],
     );
-    if (r.length === 0) throw new UnauthorizedException('Invalid refresh token');
+    if (r.length === 0) throw new UnauthorizedException('Invalid or expired refresh token');
 
     const userId = payload.sub as string;
 
