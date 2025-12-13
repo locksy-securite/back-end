@@ -1,8 +1,10 @@
 import { Body, Controller, Post, Res, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { SaltDto } from './dto/salt.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import type { Response, Request } from 'express';
 import { JwtAuthGuard } from './jwt.guard';
 import type { JwtPayload } from 'jsonwebtoken';
@@ -15,6 +17,10 @@ export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   @Post('register')
+  @ApiOperation({ summary: 'Register a new user account' })
+  @ApiResponse({ status: 201, description: 'User registered successfully, tokens returned in headers' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid registration data' })
+  @ApiResponse({ status: 409, description: 'Conflict - User already exists' })
   async register(@Body() body: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const { accessToken, refreshToken } = await this.auth.register(
       body.email,
@@ -23,7 +29,6 @@ export class AuthController {
       body.envelope
     );
 
-    console.log("REGISTERED USER:", body.email ,"salt:" + body.salt , "mdp:" + body.passwordHash);
 
     //  Stockage dans les headers au lieu des cookies
     res.setHeader('Authorization', `Bearer ${accessToken}`);
@@ -33,13 +38,21 @@ export class AuthController {
   }
 
   @Post('salt')
-  async salt(@Req() req: RequestWithUser, @Body() body: SaltDto) {
+  @ApiOperation({ summary: 'Get salt for password hashing during registration' })
+  @ApiResponse({ status: 200, description: 'Salt returned for password hashing' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid email' })
+  async salt(@Body() body: SaltDto) {
     
     const salt = await this.auth.getSalt( body.email);
     return { salt };
   }
 
   @Post('login')
+  @ApiOperation({ summary: 'Authenticate user and return JWT tokens' })
+  @ApiResponse({ status: 200, description: 'Login successful, tokens returned in response and headers' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid login data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid credentials' })
+  @ApiResponse({ status: 429, description: 'Too many login attempts' })
 async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
   const { accessToken, refreshToken } = await this.auth.login(
     body.email,
@@ -60,8 +73,12 @@ async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
 }
 
   @Post('refresh-token')
-  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const oldRefreshToken = req.headers['x-refresh-token'] as string;
+  @ApiOperation({ summary: 'Refresh access token using refresh token' })
+  @ApiResponse({ status: 200, description: 'New access token issued, returned in headers' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid or missing refresh token' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid refresh token' })
+  async refresh(@Body() body: RefreshTokenDto, @Res({ passthrough: true }) res: Response) {
+    const oldRefreshToken = body.refreshToken;
     if (!oldRefreshToken) throw new Error('No refresh token');
 
     const { accessToken, refreshToken: newRefreshToken } = await this.auth.refresh(oldRefreshToken);
