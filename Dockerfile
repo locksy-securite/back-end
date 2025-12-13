@@ -27,5 +27,8 @@ RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 
+# Exposer le port (Cloud Run fournit `PORT`, EXPOSE is informational)
+ENV PORT=3000
+
 # Lancer le serveur Nest (JS compilé)
 CMD ["node", "dist/main.js"]

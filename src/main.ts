@@ -66,7 +66,7 @@ app.use('/auth/register', authLimiter);
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document); // Swagger dispo sur /api
 
-  const port = parseInt(process.env.PORT || process.env.NEST_PORT || '3001', 10);
+  const port = parseInt(process.env.PORT|| process.env.NEST_PORT || '3001', 10);
   await app.listen(port ,'0.0.0.0');
   console.log(`Serveur NestJS démarré sur le port ${port}`);
 }
