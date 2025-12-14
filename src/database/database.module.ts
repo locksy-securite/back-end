@@ -26,9 +26,5 @@ import { Envelope } from './entity/envelope.entity';
   ],
   providers: [DatabaseService],
   exports: [DatabaseService],
-  
-  connectTimeoutMS: 5000,
-  retryAttempts: 3,
-  retryDelay: 2000,
 })
 export class DatabaseModule { }
