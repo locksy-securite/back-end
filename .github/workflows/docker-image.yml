@@ -1,4 +1,4 @@
-name: Build, push and deploy Docker image
+name: Build and push Docker image
  
 on:
   push:
@@ -10,7 +10,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write
  
     steps:
       - name: Checkout repository
@@ -37,20 +36,4 @@ jobs:
             ghcr.io/locksy-securite/back-end:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Authenticate to GCP via Workload Identity Federation
-        uses: google-github-actions/auth@v1
-        with:
-          workload_identity_provider: projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-          service_account: github-deployer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-
-      - name: Configure GCP project
-        run: gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy back-end \
-            --image ghcr.io/locksy-securite/back-end:latest \
-            --platform managed \
-            --region europe-west1 \
-            --allow-unauthenticated
+ 
