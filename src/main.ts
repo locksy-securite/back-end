@@ -8,12 +8,6 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ValidationPipe global pour valider les DTOs
-  app.useGlobalPipes(new ValidationPipe());
-
-  // Active 10+ headers de sécurité d'un coup
-  app.use(helmet());
-
   // Configuration CORS sécurisée
   const corsOrigin = process.env.CORS_ORIGIN;
   app.enableCors({
@@ -32,6 +26,12 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Autorise les cookies sécurisés
   });
+
+  // ValidationPipe global pour valider les DTOs
+  app.useGlobalPipes(new ValidationPipe());
+
+  // Active 10+ headers de sécurité d'un coup
+  app.use(helmet());
 
   // Rate limiting pour les endpoints d'authentification
   const authLimiter = rateLimit({
