@@ -121,7 +121,6 @@ Vous aurez besoin d'une base de données comme postgresSQL à installer dans ce 
 npm install -g @nestjs/cli
 npm install typeorm
 npm install jsonwebtoken
-npm install bcrypt
 npm install pg
 ```
 
