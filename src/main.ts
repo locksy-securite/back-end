@@ -14,31 +14,6 @@ async function bootstrap() {
   // Active 10+ headers de sécurité d'un coup
   app.use(helmet());
 
-  // Rate limiting pour les endpoints d'authentification
-  const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 tentatives par fenêtre
-    message: 'Trop de tentatives de connexion, réessayez dans 15 minutes',
-    standardHeaders: true,
-    legacyHeaders: false,
-  });
-
-  // Appliquer le rate limiting aux routes d'auth
-app.use('/auth/login', (req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  return authLimiter(req, res, next);
-});
-
-app.use('/auth/register', (req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  return authLimiter(req, res, next);
-});
-
-
   // Configuration CORS sécurisée
   const corsOrigin = process.env.CORS_ORIGIN;
   app.enableCors({
@@ -56,6 +31,30 @@ app.use('/auth/register', (req, res, next) => {
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Autorise les cookies sécurisés
+  });
+
+  // Rate limiting pour les endpoints d'authentification
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 tentatives par fenêtre
+    message: 'Trop de tentatives de connexion, réessayez dans 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  // Appliquer le rate limiting aux routes d'auth
+  app.use('/auth/login', (req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(204);
+    }
+    return authLimiter(req, res, next);
+  });
+  
+  app.use('/auth/register', (req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(204);
+    }
+    return authLimiter(req, res, next);
   });
 
   const swaggerConfig = new DocumentBuilder()
