@@ -40,6 +40,7 @@ async function bootstrap() {
     message: 'Trop de tentatives de connexion, réessayez dans 15 minutes',
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => req.method === 'OPTIONS',
   });
 
   app.use('/auth/login', authLimiter);
