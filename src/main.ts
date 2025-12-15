@@ -45,30 +45,6 @@ async function bootstrap() {
   app.use('/auth/login', authLimiter);
   app.use('/auth/register', authLimiter);
 
-  // Rate limiting pour les endpoints d'authentification
-  const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 tentatives par fenêtre
-    message: 'Trop de tentatives de connexion, réessayez dans 15 minutes',
-    standardHeaders: true,
-    legacyHeaders: false,
-  });
-
-  // Appliquer le rate limiting aux routes d'auth
-  app.use('/auth/login', (req, res, next) => {
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(204);
-    }
-    return authLimiter(req, res, next);
-  });
-  
-  app.use('/auth/register', (req, res, next) => {
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(204);
-    }
-    return authLimiter(req, res, next);
-  });
-
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Gestion MDP API')
     .setDescription('API sécurisée pour la gestion des mots de passe')
