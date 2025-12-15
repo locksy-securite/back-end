@@ -17,7 +17,7 @@ import { Envelope } from './entity/envelope.entity';
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
       entities: [User, Password, Note, RefreshToken, Envelope], // tu peux ajouter CreditCard si besoin
-      synchronize: false,
+      synchronize: true,
       autoLoadEntities: true, // false en prod, true seulement en dev
       ssl: {
         rejectUnauthorized: false,
