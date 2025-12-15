@@ -42,20 +42,8 @@ async function bootstrap() {
     legacyHeaders: false,
   });
 
-  // Appliquer le rate limiting aux routes d'auth
-  app.use('/auth/login', (req, res, next) => {
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(204);
-    }
-    return authLimiter(req, res, next);
-  });
-  
-  app.use('/auth/register', (req, res, next) => {
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(204);
-    }
-    return authLimiter(req, res, next);
-  });
+  app.use('/auth/login', authLimiter);
+  app.use('/auth/register', authLimiter);
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Gestion MDP API')
