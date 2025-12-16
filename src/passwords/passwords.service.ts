@@ -29,7 +29,7 @@ export class PasswordsService {
   async create(createPasswordDto: CreatePasswordDto, userId: string): Promise<Password> {
     const password = this.passwordRepository.create({
       ...createPasswordDto,
-      secret: Buffer.from(createPasswordDto.secret, 'hex'), // assuming hex string
+      secret: Buffer.from(createPasswordDto.secret, 'base64'),
       user: { id_user: userId },
     });
     return await this.passwordRepository.save(password);
