@@ -54,7 +54,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized - Invalid credentials' })
   @ApiResponse({ status: 429, description: 'Too many login attempts' })
 async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
-  const { accessToken, refreshToken } = await this.auth.login(
+  const { accessToken, refreshToken, userEmail } = await this.auth.login(
     body.email,
     body.passwordHash,
     body.envelope
@@ -69,6 +69,7 @@ async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
     message: 'Login successful',
     accessToken,
     refreshToken,
+    userEmail,
   };
 }
 
@@ -85,6 +86,8 @@ async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
 
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.setHeader('X-Refresh-Token', newRefreshToken);
+
+    res.setHeader('Access-Control-Expose-Headers', 'Authorization, X-Refresh-Token');
 
     return { message: 'Token refreshed' };
   }
