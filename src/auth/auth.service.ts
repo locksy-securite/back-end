@@ -66,7 +66,7 @@ export class AuthService {
   // Login : vérifie que le hash côté front correspond au hash en DB
   async login(email: string, passwordHashHex: string, envelope: { type: 'login'; aad_json: Record<string, unknown>; data_b64: string }) {
     const r = await this.query(
-      'SELECT id_user, password_hash FROM users WHERE email = $1',
+      'SELECT id_user, password_hash, email FROM users WHERE email = $1',
       [email],
     );
 
@@ -80,6 +80,7 @@ export class AuthService {
     }
 
     const userId = r[0].id_user;
+    const userEmail = r[0].email;
 
     // Creer un  access token
     const token = this.signToken({ sub: userId });
@@ -94,7 +95,7 @@ export class AuthService {
       [userId, 'login', JSON.stringify(envelope.aad_json), envelope.data_b64],
     );
 
-    return { accessToken: token, refreshToken };
+    return { accessToken: token, refreshToken, userEmail };
   }
 
   // Créer un JWT
